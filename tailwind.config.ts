@@ -19,7 +19,21 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Barlow', 'system-ui', 'sans-serif'],
+				display: ['"Barlow Semi Condensed"', 'Barlow', 'system-ui', 'sans-serif'],
+			},
 			colors: {
+				brand: {
+					DEFAULT: 'hsl(var(--brand))',
+					foreground: 'hsl(var(--brand-foreground))'
+				},
+				chrome: {
+					DEFAULT: 'hsl(var(--chrome))',
+					foreground: 'hsl(var(--chrome-foreground))'
+				},
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
