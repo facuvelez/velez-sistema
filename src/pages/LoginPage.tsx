@@ -2,18 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGuestOperator } from '@/contexts/GuestOperatorContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2, Wrench, Settings, Ruler, ArrowLeft } from 'lucide-react';
+import { Loader2, Wrench, Settings, Ruler, ArrowLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 type View = 'selection' | 'login';
 type LoginRole = 'Administrator' | 'Alineador';
+
+// Fuera del componente para que no se vuelva a montar en cada tecla.
+function Marco({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid min-h-screen bg-background lg:grid-cols-[minmax(420px,5fr)_7fr]">
+      <aside className="relative flex flex-col items-center justify-center bg-chrome px-6 pb-10 pt-8 text-chrome-foreground lg:pb-0 lg:pt-0">
+        <img src="/logo-velez.png" alt="Vélez Neumáticos, distribuidor oficial Dunlop" className="w-56 max-w-full sm:w-72 lg:w-96" />
+        <p className="mt-2 text-sm text-chrome-foreground/60 lg:mt-4">Sistema interno</p>
+        <div className="tread-strip absolute inset-x-0 bottom-0" aria-hidden="true" />
+      </aside>
+      <main className="flex items-center justify-center px-4 py-10 sm:px-8">
+        <div className="w-full max-w-md">{children}</div>
+      </main>
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const [view, setView] = useState<View>('selection');
@@ -101,93 +116,85 @@ export default function LoginPage() {
   if (view === 'login') {
     const roleLabel = loginRole === 'Administrator' ? 'Administración' : 'Alineador';
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{roleLabel}</CardTitle>
-            <CardDescription>Ingresá tu usuario y contraseña</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="username">Usuario</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <PasswordInput
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isSubmitting || !username || !password}>
-                {isSubmitting ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Iniciando sesión...</>
-                ) : 'Iniciar Sesión'}
-              </Button>
-              <Button type="button" variant="ghost" className="w-full" onClick={() => setView('selection')} disabled={isSubmitting}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Volver
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+      <Marco>
+        <Button type="button" variant="ghost" size="sm" className="-ml-3 mb-6" onClick={() => setView('selection')} disabled={isSubmitting}>
+          <ArrowLeft className="mr-1 h-4 w-4" /> Cambiar tipo de acceso
+        </Button>
+        <h1 className="font-display text-3xl font-semibold">{roleLabel}</h1>
+        <p className="mt-1 text-muted-foreground">Ingresá tu usuario y contraseña.</p>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="username">Usuario</Label>
+            <Input
+              id="username"
+              type="text"
+              autoComplete="username"
+              autoFocus
+              className="h-11"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={isSubmitting}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Contraseña</Label>
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              className="h-11"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isSubmitting}
+              required
+            />
+          </div>
+          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting || !username || !password}>
+            {isSubmitting ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Ingresando…</>
+            ) : 'Ingresar'}
+          </Button>
+        </form>
+      </Marco>
     );
   }
 
+  const accesos = [
+    { key: 'op', icon: Wrench, titulo: 'Operarios', desc: 'Entrás eligiendo tu nombre, sin contraseña', onClick: openOperators },
+    { key: 'adm', icon: Settings, titulo: 'Administración', desc: 'Con usuario y contraseña', onClick: () => startLogin('Administrator') },
+    { key: 'ali', icon: Ruler, titulo: 'Alineador', desc: 'Con usuario y contraseña', onClick: () => startLogin('Alineador') },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-4xl space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold">Velez Neumáticos</h1>
-          <p className="text-muted-foreground mt-2">Seleccioná tu tipo de acceso</p>
+    <>
+      <Marco>
+        <h1 className="font-display text-3xl font-semibold">Ingresar</h1>
+        <p className="mt-1 text-muted-foreground">Elegí cómo vas a entrar.</p>
+        <div className="mt-8 space-y-3">
+          {accesos.map(({ key, icon: Icon, titulo, desc, onClick }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={onClick}
+              className="group flex w-full items-center gap-4 rounded-xl border bg-card p-4 text-left shadow-sm transition-colors hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand text-brand-foreground">
+                <Icon className="h-6 w-6" />
+              </span>
+              <span className="flex-1">
+                <span className="block font-display text-lg font-semibold leading-tight">{titulo}</span>
+                <span className="block text-sm text-muted-foreground">{desc}</span>
+              </span>
+              <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            </button>
+          ))}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={openOperators}
-            className="group rounded-xl border-2 bg-card p-6 text-left transition-all hover:border-primary hover:shadow-lg"
-          >
-            <Wrench className="h-12 w-12 mb-4 text-primary" />
-            <h2 className="text-xl font-bold">Operadores</h2>
-            <p className="text-sm text-muted-foreground mt-1">Sin login — acceso directo al taller</p>
-          </button>
-
-          <button
-            onClick={() => startLogin('Administrator')}
-            className="group rounded-xl border-2 bg-card p-6 text-left transition-all hover:border-primary hover:shadow-lg"
-          >
-            <Settings className="h-12 w-12 mb-4 text-primary" />
-            <h2 className="text-xl font-bold">Administración</h2>
-            <p className="text-sm text-muted-foreground mt-1">Login con usuario y contraseña</p>
-          </button>
-
-          <button
-            onClick={() => startLogin('Alineador')}
-            className="group rounded-xl border-2 bg-card p-6 text-left transition-all hover:border-primary hover:shadow-lg"
-          >
-            <Ruler className="h-12 w-12 mb-4 text-primary" />
-            <h2 className="text-xl font-bold">Alineador</h2>
-            <p className="text-sm text-muted-foreground mt-1">Login con usuario y contraseña</p>
-          </button>
-        </div>
-      </div>
-
+      </Marco>
       <Dialog open={showOperators} onOpenChange={setShowOperators}>
         <DialogContent>
           <DialogHeader>
@@ -217,6 +224,6 @@ export default function LoginPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

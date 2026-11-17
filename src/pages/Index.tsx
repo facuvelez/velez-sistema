@@ -21,6 +21,7 @@ import { useSupabaseSync } from "@/hooks/useSupabaseSync";
 import { useCheques } from "@/hooks/useCheques";
 import { formatCurrency } from "@/utils/numberFormatter";
 import { useToast } from "@/hooks/use-toast";
+import ModuleGrid, { Bienvenida, type GrupoModulos } from "@/components/ModuleGrid";
 
 const Index = () => {
   const { profile, hasRole } = useAuth();
@@ -363,111 +364,100 @@ const Index = () => {
       );
     }
 
-    const adminCards = [
-      { title: 'Turnos', desc: 'Gestión de turnos', icon: Calendar, to: '/?tab=appointments' },
-      { title: 'Comparador', desc: 'Comparador de medidas', icon: Ruler, to: '/comparador' },
-      { title: 'Presupuestador', desc: 'Generá presupuestos', icon: FileText, to: '/presupuesto' },
-      { title: 'Taller', desc: 'Órdenes de trabajo', icon: Wrench, to: '/taller' },
-      { title: 'Comisionistas', desc: 'Recorridos y quién conviene', icon: Route, to: '/comisionistas' },
-      
-      ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Comparador de precios vs ML', icon: TrendingUp, to: '/competencia' }] : []),
+    const grupos: GrupoModulos[] = [
+      {
+        titulo: 'Taller y servicio',
+        modulos: [
+          { title: 'Turnos', desc: 'Agenda de alineación y servicios', icon: Calendar, to: '/?tab=appointments' },
+          { title: 'Taller', desc: 'Órdenes de trabajo en curso', icon: Wrench, to: '/taller' },
+          { title: 'Comparador de medidas', desc: 'Equivalencias y reemplazos de cubiertas', icon: Ruler, to: '/comparador' },
+        ],
+      },
+      {
+        titulo: 'Ventas',
+        modulos: [
+          { title: 'Presupuestador', desc: 'Armá y enviá presupuestos', icon: FileText, to: '/presupuesto' },
+          ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Nuestros precios vs MercadoLibre', icon: TrendingUp, to: '/competencia' }] : []),
+        ],
+      },
+      {
+        titulo: 'Logística',
+        modulos: [
+          { title: 'Comisionistas', desc: 'Recorridos y quién conviene para cada envío', icon: Route, to: '/comisionistas' },
+        ],
+      },
     ];
     return (
       <div className="min-h-screen bg-background">
         <AppHeader />
-        <div className="container mx-auto px-4 py-6 max-w-5xl flex flex-col">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
-            {adminCards.map(({ title, desc, icon: Icon, to }) => (
-              <Card
-                key={to}
-                onClick={() => navigate(to)}
-                className="cursor-pointer hover:-translate-y-0.5 hover:shadow-xl transition-all border-border min-h-[160px]"
-              >
-                <CardHeader className="flex flex-col items-center justify-center text-center h-full py-8 gap-4">
-                  <div className="rounded-xl bg-primary/10 p-4 text-primary">
-                    <Icon className="h-10 w-10" />
-                  </div>
-                  <CardTitle className="text-xl">{title}</CardTitle>
-                  <CardDescription className="text-sm">{desc}</CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </div>
+        <main className="container mx-auto max-w-6xl px-4 py-8">
+          <Bienvenida nombre={profile?.username} />
+          <ModuleGrid grupos={grupos} />
+        </main>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader 
-        description={"\n"}
-      />
+      <AppHeader />
 
 
-      <div className="container mx-auto p-2 sm:p-4 max-w-7xl">
+      <div className="container mx-auto max-w-7xl px-3 py-6 sm:px-4">
         {/* Main Content */}
-        <Card>
-          <CardContent className="p-3 sm:p-6">
+        <div>
+          <div>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="overflow-x-auto -mx-3 sm:mx-0 mb-6">
-                <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full h-auto sm:h-10 p-1"
-                  style={{
-                    gridTemplateColumns: hasRole('Administrator')
-                      ? 'repeat(4, 1fr)'
-                      : 'repeat(2, 1fr)'
-                  }}
-                >
-                  <TabsTrigger value="home" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2">
+              <div className="mb-8 overflow-x-auto">
+                <TabsList>
+                  <TabsTrigger value="home" className="px-4">
                     Inicio
                   </TabsTrigger>
-                  <TabsTrigger value="appointments" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2">
+                  <TabsTrigger value="appointments" className="px-4">
                     Turnos
                   </TabsTrigger>
                   {hasRole('Administrator') && (
-                    <TabsTrigger value="clients" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2">
+                    <TabsTrigger value="clients" className="px-4">
                       Clientes
                     </TabsTrigger>
                   )}
                   {hasRole('Administrator') && (
-                    <TabsTrigger value="users" className="whitespace-nowrap text-xs sm:text-sm px-3 sm:px-4 py-2">
-                      <Settings className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="hidden sm:inline">Usuarios</span>
-                      <span className="sm:hidden">Users</span>
+                    <TabsTrigger value="users" className="px-4">
+                      <Settings className="mr-1.5 h-4 w-4" />
+                      Usuarios
                     </TabsTrigger>
                   )}
                 </TabsList>
               </div>
 
-              <TabsContent value="home">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {[
-                    { title: 'Proveedores', desc: 'Marcas, descuentos y compras', icon: Truck, to: '/suppliers' },
-                    { title: 'Precios', desc: 'Simulador de flujos de precio', icon: Calculator, to: '/price-flows' },
-                    { title: 'Comparador de Medidas', desc: 'Asesoramiento técnico para montaje de cubiertas', icon: Ruler, to: '/comparador' },
-                    { title: 'Presupuestador', desc: 'Generá y enviá presupuestos por WhatsApp', icon: FileText, to: '/presupuesto' },
-                    { title: 'Taller', desc: 'Órdenes de trabajo en curso', icon: Wrench, to: '/taller' },
-                    { title: 'Comisionistas', desc: 'Recorridos, mapa y quién conviene para cada envío', icon: Route, to: '/comisionistas' },
-                    
-                    ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Comparador de precios vs MercadoLibre', icon: TrendingUp, to: '/competencia' }] : []),
-                  ].map(({ title, desc, icon: Icon, to }) => (
-                    <Card
-                      key={to}
-                      onClick={() => navigate(to)}
-                      className="cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl border-border"
-                    >
-                      <CardHeader>
-                        <div className="flex items-center gap-3">
-                          <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                            <Icon className="h-6 w-6" />
-                          </div>
-                          <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
-                        </div>
-                        <CardDescription className="mt-2 text-xs sm:text-sm">{desc}</CardDescription>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
+              <TabsContent value="home" className="mt-0">
+                <Bienvenida nombre={profile?.username} />
+                <ModuleGrid
+                  grupos={[
+                    {
+                      titulo: 'Ventas y precios',
+                      modulos: [
+                        { title: 'Presupuestador', desc: 'Armá y enviá presupuestos por WhatsApp', icon: FileText, to: '/presupuesto' },
+                        { title: 'Proveedores', desc: 'Marcas, descuentos y listas', icon: Truck, to: '/suppliers' },
+                        { title: 'Precios', desc: 'Simulador de flujos de precio', icon: Calculator, to: '/price-flows' },
+                        ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Nuestros precios vs MercadoLibre', icon: TrendingUp, to: '/competencia' }] : []),
+                      ],
+                    },
+                    {
+                      titulo: 'Taller y servicio',
+                      modulos: [
+                        { title: 'Taller', desc: 'Órdenes de trabajo en curso', icon: Wrench, to: '/taller' },
+                        { title: 'Comparador de medidas', desc: 'Equivalencias y reemplazos de cubiertas', icon: Ruler, to: '/comparador' },
+                      ],
+                    },
+                    {
+                      titulo: 'Logística',
+                      modulos: [
+                        { title: 'Comisionistas', desc: 'Recorridos y quién conviene para cada envío', icon: Route, to: '/comisionistas' },
+                      ],
+                    },
+                  ]}
+                />
               </TabsContent>
 
 
@@ -521,8 +511,8 @@ const Index = () => {
                 </TabsContent>
               )}
             </Tabs>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Modals */}
         {showClientForm && (
