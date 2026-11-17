@@ -21,6 +21,7 @@ import ComparatorPage from "./pages/ComparatorPage";
 import PresupuestoPage from "./pages/PresupuestoPage";
 import WorkOrdersPage from "./pages/WorkOrdersPage";
 import PriceCompetitionPage from "./pages/PriceCompetitionPage";
+import ComisionistasPage from "./pages/ComisionistasPage";
 import HelpAssistantWidget from "@/components/help/HelpAssistantWidget";
 
 import NotFound from "./pages/NotFound";
@@ -96,6 +97,11 @@ const App = () => (
               <Route path="/competencia" element={
                 <ProtectedRoute allowedRoles={['Administrator']}>
                   <PriceCompetitionPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/comisionistas" element={
+                <ProtectedRoute allowedRoles={['Administrator', 'Administracion']}>
+                  <ComisionistasPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

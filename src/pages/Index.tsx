@@ -5,7 +5,7 @@ import { Navigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Settings, FileText, Truck, Calculator, Ruler, Wrench, Calendar, ArrowLeft, TrendingUp } from "lucide-react";
+import { Loader2, Settings, FileText, Truck, Calculator, Ruler, Wrench, Calendar, ArrowLeft, TrendingUp, Route } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
@@ -368,6 +368,7 @@ const Index = () => {
       { title: 'Comparador', desc: 'Comparador de medidas', icon: Ruler, to: '/comparador' },
       { title: 'Presupuestador', desc: 'Generá presupuestos', icon: FileText, to: '/presupuesto' },
       { title: 'Taller', desc: 'Órdenes de trabajo', icon: Wrench, to: '/taller' },
+      { title: 'Comisionistas', desc: 'Recorridos y quién conviene', icon: Route, to: '/comisionistas' },
       
       ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Comparador de precios vs ML', icon: TrendingUp, to: '/competencia' }] : []),
     ];
@@ -446,6 +447,7 @@ const Index = () => {
                     { title: 'Comparador de Medidas', desc: 'Asesoramiento técnico para montaje de cubiertas', icon: Ruler, to: '/comparador' },
                     { title: 'Presupuestador', desc: 'Generá y enviá presupuestos por WhatsApp', icon: FileText, to: '/presupuesto' },
                     { title: 'Taller', desc: 'Órdenes de trabajo en curso', icon: Wrench, to: '/taller' },
+                    { title: 'Comisionistas', desc: 'Recorridos, mapa y quién conviene para cada envío', icon: Route, to: '/comisionistas' },
                     
                     ...(hasRole('Administrator') ? [{ title: 'Competencia', desc: 'Comparador de precios vs MercadoLibre', icon: TrendingUp, to: '/competencia' }] : []),
                   ].map(({ title, desc, icon: Icon, to }) => (
