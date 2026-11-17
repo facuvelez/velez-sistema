@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# La app es de una sola página (react-router): todas las rutas deben abrir index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
