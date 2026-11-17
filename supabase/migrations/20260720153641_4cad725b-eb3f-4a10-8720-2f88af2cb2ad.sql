@@ -1,0 +1,6 @@
+ALTER TABLE public.appointments
+  ADD COLUMN IF NOT EXISTS kilometraje INTEGER,
+  ADD COLUMN IF NOT EXISTS client_phone TEXT,
+  ADD COLUMN IF NOT EXISTS whatsapp_sent BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS completed_by_username TEXT,
+  ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
